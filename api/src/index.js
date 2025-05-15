@@ -1,31 +1,68 @@
-import "dotenv/config";
+/* 
+Routes
+Route Description
+/future-meals	Respond with all meals in the future (relative to the when datetime)
+/past-meals	Respond with all meals in the past (relative to the when datetime)
+/all-meals	Respond with all meals sorted by ID
+/first-meal	Respond with the first meal (meaning with the minimum id)
+/last-meal	Respond with the last meal (meaning with the maximum id)
+
+Responses
+All the specified routes should respond with JSON with the available columns from the meal table.
+
+Multiple meals: /future-meals, /past-meals and /all-meals are expected to respond with a collection of meals, meaning an array of objects.
+
+Single meal: The other 2 routes, /first-meal and /last-meal, are expected to respond with a single meal, meaning an object.
+
+What if there are no meals?: /first-meal and /last-meal should in that case return a 404 response with an explanation that there are no meals. The other routes should in that case just return an empty array.
+*/
+
 import express from "express";
-import cors from "cors";
-import bodyParser from "body-parser";
-import knex from "./database_client.js";
-import nestedRouter from "./routers/nested.js";
+import { getMeals } from "./models.js";
 
 const app = express();
-app.use(cors());
-app.use(bodyParser.json());
+const PORT = process.env.PORT;
 
-const apiRouter = express.Router();
+const error404 = "There are no meal for your request";
 
-// You can delete this route once you add your own routes
-apiRouter.get("/", async (req, res) => {
-  const SHOW_TABLES_QUERY =
-    process.env.DB_CLIENT === "pg"
-      ? "SELECT * FROM pg_catalog.pg_tables;"
-      : "SHOW TABLES;";
-  const tables = await knex.raw(SHOW_TABLES_QUERY);
-  res.json({ tables });
+/* Function that checks whether the meals array is empty*/
+const mealError = (meals, res) => {
+  if (meals.length === 0) {
+    res.status(404).send(error404);
+  } else {
+    res.json(meals);
+  }
+};
+
+app.get("/", (req, res) => {
+  res.send("Welcome to Meal Sharing");
 });
 
-// This nested router example can also be replaced with your own sub-router
-apiRouter.use("/nested", nestedRouter);
+app.get("/all-meals", async (req, res) => {
+  const meals = await getMeals("ORDER BY id");
+  mealError(meals, res);
+});
 
-app.use("/api", apiRouter);
+app.get("/future-meals", async (req, res) => {
+  const meals = await getMeals("WHERE when_time > NOW()");
+  mealError(meals, res);
+});
 
-app.listen(process.env.PORT, () => {
-  console.log(`API listening on port ${process.env.PORT}`);
+app.get("/past-meals", async (req, res) => {
+  const meals = await getMeals("WHERE when_time < NOW()");
+  mealError(meals, res);
+});
+
+app.get("/first-meal", async (req, res) => {
+  const meals = await getMeals("WHERE id = (SELECT MIN(id) FROM meal)");
+  mealError(meals, res);
+});
+
+app.get("/last-meal", async (req, res) => {
+  const meals = await getMeals("WHERE id = (SELECT MAX(id) FROM meal)");
+  mealError(meals, res);
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
