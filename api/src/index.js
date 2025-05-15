@@ -55,6 +55,7 @@ app.get("/past-meals", async (req, res) => {
 
 app.get("/first-meal", async (req, res) => {
   const meals = await getMeals("WHERE id = (SELECT MIN(id) FROM meal)");
+  mealError(meals, res);
 });
 
 app.get("/last-meal", async (req, res) => {
