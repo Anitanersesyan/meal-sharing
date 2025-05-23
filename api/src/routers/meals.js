@@ -1,5 +1,5 @@
 import express from "express";
-import { StatusCodes } from "http-status-codes/build/cjs/index.js";
+import { StatusCodes } from "http-status-codes";
 import db from "../db.js";
 
 const router = express.Router();
@@ -31,12 +31,19 @@ router.post("/", async (req, res) => {
 // /api/meals/:id- GET Returns the meal by id
 router.get("/:id", async (req, res) => {
   try {
-    const meal = await db.select().from("meal").where({ id: req.params.id });
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid ID" });
+    }
+
+    const meal = await db("meal").where({ id });
+
     if (meal.length === 0) {
       return res.status(StatusCodes.NOT_FOUND).json({
         error: "Meal not found",
       });
     }
+
     res.status(StatusCodes.OK).json(meal[0]);
   } catch (error) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
