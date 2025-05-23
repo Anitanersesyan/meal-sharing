@@ -64,6 +64,8 @@ app.get("/first-meal", async (req, res) => {
     console.error("Error fetching first meal:", error);
     res.status(500).json({ error: "Internal server error" });
   }
+  const meals = await getMeals("WHERE id = (SELECT MIN(id) FROM meal)");
+  mealError(meals, res);
 });
 
 app.get("/last-meal", async (req, res) => {
