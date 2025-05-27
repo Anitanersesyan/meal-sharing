@@ -2,12 +2,14 @@ import express from "express";
 import { getMeals } from "./models.js";
 import mealsRouter from "./routers/meals.js";
 import reservationsRouter from "./routers/reservations.js";
+import reviewsRouter from "./routers/reviews.js";
 
 const app = express();
 app.use(express.json());
 
 app.use("/api/meals", mealsRouter);
 app.use("/api/reservations", reservationsRouter);
+app.use("/api/reviews", reviewsRouter);
 
 const PORT = process.env.PORT || 3001;
 
