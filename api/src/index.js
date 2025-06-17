@@ -3,9 +3,18 @@ import { getMeals } from "./models.js";
 import mealsRouter from "./routers/meals.js";
 import reservationsRouter from "./routers/reservations.js";
 import reviewsRouter from "./routers/reviews.js";
+import cors from "cors";
 
 const app = express();
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true,
+  })
+);
 
 app.use("/api/meals", mealsRouter);
 app.use("/api/reservations", reservationsRouter);
