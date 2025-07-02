@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import styles from "./MealsList.module.css";
-
+import Meal from "../Meal/Meal";
+import api from "@/utils/api";
 const MealsList = () => {
   const [meals, setMeals] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -11,7 +12,7 @@ const MealsList = () => {
   useEffect(() => {
     const fetchMeals = async () => {
       try {
-        const response = await fetch("http://localhost:3001/api/meals", {
+        const response = await fetch(api("/meals"), {
           headers: {
             "Content-Type": "application/json",
           },
@@ -30,6 +31,7 @@ const MealsList = () => {
       }
       setIsLoading(false);
     };
+
     fetchMeals();
   }, []);
 
@@ -48,15 +50,11 @@ const MealsList = () => {
   return (
     <div className={styles.container}>
       <h2 className={styles.title}>Available Meals</h2>
-      {meals.map((meal) => (
-        <div key={meal.id} className={styles.mealCard}>
-          <h3 className={styles.mealTitle}>{meal.title}</h3>
-          <p className={styles.mealDescription}>{meal.description}</p>
-          <p className={styles.mealPrice}>
-            Price: ${meal?.price ? Number(meal.price).toFixed(2) : "N/A"}
-          </p>{" "}
-        </div>
-      ))}
+      <div className={styles.mealsList}>
+        {meals.map((meal) => (
+          <Meal key={meal.id} meal={meal} />
+        ))}
+      </div>
     </div>
   );
 };
