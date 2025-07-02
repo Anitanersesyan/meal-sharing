@@ -4,7 +4,7 @@ import db from "../db.js";
 
 const router = express.Router();
 
-// /api/reviews - GET	Returns all reviews
+// GET /api/reviews - Returns all reviews
 router.get("/", async (req, res) => {
   try {
     const reviews = await db.select().from("review");
@@ -16,57 +16,49 @@ router.get("/", async (req, res) => {
   }
 });
 
-// /api/meals/:meal_id/reviews	GET	Returns all reviews for a specific meal
-router.get("/meal/:meal_id/reviews", async (req, res) => {
+// GET /api/reviews/:mealId - Returns all reviews for a specific meal
+router.get("/:mealId", async (req, res) => {
   try {
-    const mealId = Number(req.params.meal_id);
+    const mealId = Number(req.params.mealId);
     if (isNaN(mealId)) {
       return res
         .status(StatusCodes.BAD_REQUEST)
         .json({ error: "Invalid meal ID" });
     }
-
     const reviews = await db("review").where({ meal_id: mealId });
-
-    if (reviews.length === 0) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        error: "No reviews found for this meal",
-      });
-    }
-
     res.status(StatusCodes.OK).json(reviews);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      error: "Internal server error, failed to fetch reviews for the meal",
-    });
+    console.error(error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "Internal server error" });
   }
 });
 
-// /api/reviews/:id- GET Returns the review by id
-router.get("/:id", async (req, res) => {
+// POST /api/reviews - Add a new review
+router.post("/", async (req, res) => {
   try {
-    const id = Number(req.params.id);
-    if (isNaN(id)) {
-      return res.status(StatusCodes.BAD_REQUEST).json({ error: "Invalid ID" });
+    const { title, description, stars, meal_id, created_date } = req.body;
+    if (!title || !description || !stars || !meal_id) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ error: "Missing required fields" });
     }
 
-    const review = await db("review").where({ id });
+    const [newReview] = await db("review")
+      .insert({ title, description, stars, meal_id, created_date })
+      .returning("*"); // returning inserted row(s)
 
-    if (review.length === 0) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        error: "Review not found",
-      });
-    }
-
-    res.status(StatusCodes.OK).json(review[0]);
+    res.status(StatusCodes.CREATED).json(newReview);
   } catch (error) {
+    console.error("Create review error:", error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      error: "Internal server error, failed to fetch review",
+      error: "Internal server error, failed to create review",
     });
   }
 });
 
-// /api/reviews/:id	PUT	Updates the review by id
+// PUT /api/reviews/:id - Update a review by id
 router.put("/:id", async (req, res) => {
   try {
     const updatedCount = await db("review")
@@ -74,11 +66,12 @@ router.put("/:id", async (req, res) => {
       .update(req.body);
 
     if (!updatedCount) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        error: "review not found",
-      });
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "Review not found" });
     }
-    res.status(StatusCodes.OK).json({ message: "review updated successfully" });
+
+    res.status(StatusCodes.OK).json({ message: "Review updated successfully" });
   } catch (error) {
     console.error("Update review error:", error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -87,19 +80,20 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// /api/reviews/:id- DELETE Deletes the review by id
+// DELETE /api/reviews/:id - Delete a review by id
 router.delete("/:id", async (req, res) => {
   try {
     const deletedCount = await db("review").where({ id: req.params.id }).del();
 
     if (!deletedCount) {
-      return res.status(StatusCodes.NOT_FOUND).json({
-        error: "Review not found",
-      });
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ error: "Review not found" });
     }
+
     res.status(StatusCodes.OK).json({ message: "Review deleted successfully" });
   } catch (error) {
-    console.error("Delete review error:", error.stack || error);
+    console.error("Delete review error:", error);
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
       error: "Internal server error, failed to delete review",
     });

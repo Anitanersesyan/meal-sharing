@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from "react";
 import styles from "./MealsList.module.css";
 import Meal from "../Meal/Meal";
-import api from "@/utils/api";
+import api from "../../utils/api";
+
 const MealsList = () => {
   const [meals, setMeals] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -28,6 +29,7 @@ const MealsList = () => {
         setError(
           "Error loading meals: server unavailable. Please try again later."
         );
+        console.error("Error fetching meals:", error);
       }
       setIsLoading(false);
     };
@@ -40,7 +42,7 @@ const MealsList = () => {
   }
 
   if (error) {
-    return <p className={styles.error}>Error loading meals: {error}</p>;
+    return <p className={styles.error}>{error}</p>;
   }
 
   if (meals.length === 0) {
@@ -49,7 +51,7 @@ const MealsList = () => {
 
   return (
     <div className={styles.container}>
-      <h2 className={styles.title}>Available Meals</h2>
+      <h2 className={styles.title}>All Available Meals</h2>{" "}
       <div className={styles.mealsList}>
         {meals.map((meal) => (
           <Meal key={meal.id} meal={meal} />
