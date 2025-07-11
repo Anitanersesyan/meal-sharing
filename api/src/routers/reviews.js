@@ -54,7 +54,6 @@ router.post("/", async (req, res) => {
       return res.status(404).json({ error: "Meal not found" });
     }
 
-    // **Add logging here**
     console.log("Inserting review:", {
       title,
       description,
