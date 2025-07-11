@@ -24,7 +24,7 @@ const ReservationForm = ({ mealId, maxReservations }) => {
     setMessage({ text: "", isError: false });
 
     try {
-      const response = await fetch("/api/reservations", {
+      const response = await fetch("http://localhost:3001/api/reservations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -38,23 +38,49 @@ router.get("/:mealId", async (req, res) => {
 // POST /api/reviews - Add a new review
 router.post("/", async (req, res) => {
   try {
-    const { title, description, stars, meal_id, created_date } = req.body;
-    if (!title || !description || !stars || !meal_id) {
-      return res
-        .status(StatusCodes.BAD_REQUEST)
-        .json({ error: "Missing required fields" });
+    const { title, description, meal_id, stars } = req.body;
+
+    const mealIdInt = Number(meal_id);
+    const starsInt = Number(stars);
+
+    if (!mealIdInt || !starsInt || starsInt < 1 || starsInt > 5) {
+      return res.status(400).json({
+        error: "meal_id and stars must be valid numbers. stars must be 1-5.",
+      });
     }
 
-    const [newReview] = await db("review")
-      .insert({ title, description, stars, meal_id, created_date })
-      .returning("*"); // returning inserted row(s)
+    const meal = await db("meal").where({ id: mealIdInt }).first();
+    if (!meal) {
+      return res.status(404).json({ error: "Meal not found" });
+    }
 
-    res.status(StatusCodes.CREATED).json(newReview);
+    // **Add logging here**
+    console.log("Inserting review:", {
+      title,
+      description,
+      meal_id: mealIdInt,
+      stars: starsInt,
+    });
+
+    const insertedIds = await db("review").insert({
+      title,
+      description,
+      meal_id: mealIdInt,
+      stars: starsInt,
+    });
+
+    console.log("Inserted IDs:", insertedIds);
+
+    res.status(201).json({
+      id: insertedIds[0], // inserted row id
+      title,
+      description,
+      meal_id: mealIdInt,
+      stars: starsInt,
+    });
   } catch (error) {
     console.error("Create review error:", error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-      error: "Internal server error, failed to create review",
-    });
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 
