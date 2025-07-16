@@ -1,4 +1,3 @@
-// components/ReviewsSection/ReviewsSection.jsx
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -18,7 +17,7 @@ const ReviewsSection = ({ mealId }) => {
     const fetchReviews = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3001/api/reviews?meal_id=${mealId}`
+          `http://localhost:3001/api/reviews/${mealId}`
         );
         if (!response.ok) throw new Error("Failed to fetch reviews");
         const data = await response.json();
@@ -47,7 +46,7 @@ const ReviewsSection = ({ mealId }) => {
         body: JSON.stringify({
           ...newReview,
           meal_id: mealId,
-          created_at: new Date().toISOString(), // Changed to created_at to match your review rendering
+          // **Do NOT send created_at** — backend will handle it
         }),
       });
 

@@ -127,6 +127,11 @@ const MealDetail = ({ mealId }) => {
             <p>
               <strong>Max reservations:</strong> {meal.max_reservations}
             </p>
+            <p className={styles.availableSpots}>
+              <strong>Available spots:</strong>{" "}
+              {meal.available_spots ??
+                meal.max_reservations - (meal.reserved_guests || 0)}
+            </p>
           </div>
         </div>
       </div>
