@@ -3,8 +3,6 @@ import styles from "./Meal.module.css";
 import Link from "next/link";
 
 const Meal = ({ meal }) => {
-  const spotsLeft = meal.max_reservations - (meal.reserved_guests || 0);
-
   return (
     <div className={styles.mealCard}>
       <div className={styles.mealImageContainer}>
@@ -26,9 +24,6 @@ const Meal = ({ meal }) => {
         <p className={styles.mealDescription}>{meal.description}</p>
         <p className={styles.mealPrice}>
           {meal?.price ? Number(meal.price).toFixed(2) : "N/A"} DKK
-        </p>
-        <p className={styles.mealAvailability}>
-          {spotsLeft > 0 ? `Available spots: ${spotsLeft}` : "Fully booked"}
         </p>
         <Link href={`/meals/${meal.id}`} className={styles.detailsButton}>
           See Details
