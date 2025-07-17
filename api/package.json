@@ -10,7 +10,7 @@
   },
   "scripts": {
     "start:dev": "node --watch --env-file=.env src/index.js",
-    "start": "node src/index.mjs",
+    "start": "node src/index.js",
     "format": "npx prettier . --write",
     "check": "npx eslint . --fix"
   },
