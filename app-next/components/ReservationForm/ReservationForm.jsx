@@ -24,16 +24,19 @@ const ReservationForm = ({ mealId, maxReservations }) => {
     setMessage({ text: "", isError: false });
 
     try {
-      const response = await fetch("http://localhost:3001/api/reservations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...formData,
-          meal_id: mealId,
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/reservations`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...formData,
+            meal_id: mealId,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(await response.text());

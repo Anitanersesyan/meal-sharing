@@ -18,7 +18,7 @@ const MealDetail = ({ mealId }) => {
       try {
         setIsLoading(true);
         const response = await fetch(
-          `http://localhost:3001/api/meals/${mealId}`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/meals/${mealId}`
         );
 
         if (!response.ok) {

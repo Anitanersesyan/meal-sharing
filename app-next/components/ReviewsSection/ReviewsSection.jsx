@@ -17,7 +17,7 @@ const ReviewsSection = ({ mealId }) => {
     const fetchReviews = async () => {
       try {
         const response = await fetch(
-          `http://localhost:3001/api/reviews/${mealId}`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/reviews/${mealId}`
         );
         if (!response.ok) throw new Error("Failed to fetch reviews");
         const data = await response.json();
@@ -38,17 +38,19 @@ const ReviewsSection = ({ mealId }) => {
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3001/api/reviews", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...newReview,
-          meal_id: mealId,
-          // **Do NOT send created_at** — backend will handle it
-        }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/reviews`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...newReview,
+            meal_id: mealId,
+          }),
+        }
+      );
 
       if (!response.ok) throw new Error("Failed to submit review");
 

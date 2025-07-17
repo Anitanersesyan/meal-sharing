@@ -45,8 +45,8 @@ router.get("/", async (req, res) => {
 
     // title - Returns all meals that partially match the given title.
     if (req.query.title) {
-      const title = req.query.title.trim();
-      query = query.where("title", "like", `%${req.query.title}%`);
+      const title = req.query.title.trim().toLowerCase();
+      query = query.whereILike("title", `%${req.query.title.trim()}%`);
     }
 
     // dateAfter - Returns all meals where the date for when is after the given date
