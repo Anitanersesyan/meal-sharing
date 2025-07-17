@@ -82,7 +82,6 @@ const MealsList = () => {
           : "All Available Meals"}
       </h2>
 
-      {/* 👇 Sort Controls */}
       <SortControls
         sortKey={sortKey}
         setSortKey={setSortKey}
