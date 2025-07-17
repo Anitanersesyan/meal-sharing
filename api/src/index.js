@@ -10,7 +10,10 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "https://meal-sharing-1-rc3o.onrender.com",
+    ],
     methods: ["GET", "POST"],
     credentials: true,
   })
