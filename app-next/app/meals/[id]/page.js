@@ -1,5 +1,3 @@
-"use client";
-
 import MealDetail from "../../../components/MealDetail/MealDetail";
 
 export async function generateStaticParams() {
